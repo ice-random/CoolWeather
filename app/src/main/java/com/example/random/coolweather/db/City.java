@@ -1,5 +1,6 @@
 package com.example.random.coolweather.db;
 
+
 import org.litepal.crud.DataSupport;
 
 /**
