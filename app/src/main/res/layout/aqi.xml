@@ -6,14 +6,6 @@
     android:background="#8000"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="15dp"
-        android:text="空气质量"
-        android:textColor="#fff"
-        android:textSize="20sp" />
 
     <LinearLayout
         android:layout_width="match_parent"

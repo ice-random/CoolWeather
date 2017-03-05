@@ -9,11 +9,25 @@ import java.util.List;
  */
 
 public class Weather {
+    //    HeWeather5: [
+//    {
+//        aqi: {},
+//        basic: {},
+//        daily_forecast: [],
+//        hourly_forecast: [],
+//        now: {},
+//        status: "ok",
+//                suggestion: {}
+//    }
+//    ]
+    public Alarm alarms;
     public String status;
     public Basic basic;
     public AQI aqi;
     public Now now;
     public Suggestion suggestion;
     @SerializedName("daily_forecast")
-    public List<Forecast> forecastList;
+    public List<dailyForecast> dforecastList;
+    @SerializedName("hourly_forecast")
+    public List<hourlyForecast> hforecastList;
 }
