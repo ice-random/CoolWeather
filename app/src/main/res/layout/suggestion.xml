@@ -73,11 +73,12 @@
                     android:textSize="15sp" />
 
                 <TextView
+                    android:id="@+id/textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="日落"
                     android:textColor="#fff"
-                    android:textSize="20sp" />
+                    android:textSize="15sp" />
 
             </LinearLayout>
 
@@ -114,6 +115,7 @@
                     android:id="@+id/tv_show_air"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
                     android:textColor="#fff"
                     android:textSize="15sp" />
 
@@ -123,7 +125,7 @@
                     android:layout_gravity="center"
                     android:text="空气质量"
                     android:textColor="#fff"
-                    android:textSize="20sp" />
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <TextView
@@ -154,6 +156,7 @@
                     android:id="@+id/tv_show_comfort"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
                     android:textColor="#fff"
                     android:textSize="15sp" />
 
@@ -163,7 +166,7 @@
                     android:layout_gravity="center"
                     android:text="舒适度"
                     android:textColor="#fff"
-                    android:textSize="20sp" />
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <TextView
@@ -199,6 +202,7 @@
                     android:id="@+id/tv_show_carWash"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
                     android:textColor="#fff"
                     android:textSize="15sp" />
 
@@ -208,7 +212,7 @@
                     android:layout_gravity="center"
                     android:text="洗车"
                     android:textColor="#fff"
-                    android:textSize="20sp" />
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <TextView
@@ -239,6 +243,7 @@
                     android:id="@+id/tv_show_dressing"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
                     android:textColor="#fff"
                     android:textSize="15sp" />
 
@@ -248,7 +253,7 @@
                     android:layout_gravity="center"
                     android:text="穿衣指数"
                     android:textColor="#fff"
-                    android:textSize="20sp" />
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <TextView
@@ -284,16 +289,18 @@
                     android:id="@+id/tv_show_sport"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
                     android:textColor="#fff"
                     android:textSize="15sp" />
 
                 <TextView
+                    android:id="@+id/textView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="户外锻炼"
                     android:textColor="#fff"
-                    android:textSize="20sp" />
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <TextView
@@ -324,16 +331,18 @@
                     android:id="@+id/tv_show_flu"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
                     android:textColor="#fff"
                     android:textSize="15sp" />
 
                 <TextView
+                    android:id="@+id/textView3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="感冒指数"
                     android:textColor="#fff"
-                    android:textSize="20sp" />
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <TextView
@@ -369,16 +378,18 @@
                     android:id="@+id/tv_show_travel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
                     android:textColor="#fff"
                     android:textSize="15sp" />
 
                 <TextView
+                    android:id="@+id/textView4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="旅游"
                     android:textColor="#fff"
-                    android:textSize="20sp" />
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <TextView
@@ -409,6 +420,7 @@
                     android:id="@+id/tv_show_ultraviolet"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
                     android:textColor="#fff"
                     android:textSize="15sp" />
 
@@ -418,7 +430,7 @@
                     android:layout_gravity="center"
                     android:text="紫外线"
                     android:textColor="#fff"
-                    android:textSize="20sp" />
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <TextView
