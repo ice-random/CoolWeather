@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">CoolWeather</string>
-    <string name="add">添加</string>
 
     <string name="sun_set">&#xe67a;</string>
     <string name="sport">&#xe627;</string>
@@ -12,4 +11,6 @@
     <string name="travel">&#xe616;</string>
     <string name="comfort">&#xe679;</string>
     <string name="air">&#xe697;</string>
+    <string name="more">&#xe61e;</string>
+    <string name="category">&#xe699;</string>
 </resources>

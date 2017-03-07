@@ -11,9 +11,12 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -59,6 +62,8 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
 
     private ImageButton choose_area;
 
+    private Button btn_Nav;
+
     private TextView tv_sunrise, tv_sunset, tv_comfort, tv_carWash,
             tv_dressing, tv_sport, tv_travel, tv_ultraviolet, tv_air, tv_flu;
 
@@ -75,6 +80,12 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
 
     private String weatherId;
 
+    private DrawerLayout drawer_layout;
+
+    private Toolbar toolbar;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,19 +97,41 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
         setContentView(R.layout.activity_weather);
-//        初始化各控件
         init();
     }
 
-    private void init() {
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        choose_area = (ImageButton) findViewById(R.id.choose_area);
-        choose_area.setOnClickListener(this);
 
+
+    /**
+     * 初始化
+     */
+    private void init() {
+        toolbar= (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
+        //隐藏toolbar的标题
+        drawer_layout= (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBar actionBar=getSupportActionBar();
+        if (actionBar!=null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.mipmap.category);
+        }
+        NavigationView navView= (NavigationView) findViewById(R.id.nav_view);
+        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                drawer_layout.closeDrawers();
+                return true;
+            }
+        });
+
+
+//        btn_Nav= (Button) findViewById(R.id.btn_Nav);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
         weatherLayout = (ScrollView) findViewById(R.id.weather_layout);
         titleCity = (TextView) findViewById(R.id.title_city);
-        titleUpdateTime = (TextView) findViewById(R.id.title_update_time);
+//        titleUpdateTime = (TextView) findViewById(R.id.title_update_time);
         degreeText = (TextView) findViewById(R.id.degree_text);
         weatherInfoText = (TextView) findViewById(R.id.weather_info_text);
         forecastLayout = (LinearLayout) findViewById(R.id.forecast_layout);
@@ -136,6 +169,9 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
         tv_show_ultraviolet.setTypeface(font);
         tv_show_air.setTypeface(font);
         tv_show_flu.setTypeface(font);
+//        btn_Nav.setTypeface(font);
+//        btn_Nav.setText(R.string.category);
+
         tv_show_sunrise.setText(getResources().getString(R.string.sun_rise));
         tv_show_sunset.setText(getResources().getString(R.string.sun_set));
         tv_show_comfort.setText(getResources().getString(R.string.comfort));
@@ -179,6 +215,9 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
         }
     }
 
+    /**
+     * 加载必应每日一图
+     */
     private void loadBingPic() {
         String requestBingPic = "http://guolin.tech/api/bing_pic";
         HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
@@ -257,6 +296,8 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
         loadBingPic();
     }
 
+
+
     /**
      * 处理并展示Weather实体类中的数据
      *
@@ -269,7 +310,7 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
             String degree = weather.now.temperature + "°C";
             String weatherInfo = weather.now.condition.info;
             titleCity.setText(cityName);
-            titleUpdateTime.setText(updateTime);
+//            titleUpdateTime.setText(updateTime);
             degreeText.setText(degree);
             weatherInfoText.setText(weatherInfo);
             forecastLayout.removeAllViews();
@@ -289,29 +330,17 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
                 aqiText.setText(weather.aqi.city.aqi);
                 pm25Text.setText(weather.aqi.city.pm25);
             }
-
-//        private TextView tv_sunrise;
             tv_sunrise.setText(weather.dforecastList.get(0).astronomy.sunRise);
-//        private TextView tv_sunset;
             tv_sunset.setText(weather.dforecastList.get(0).astronomy.sunSet);
-//        private TextView tv_comfort;
             tv_comfort.setText(weather.suggestion.comfort.brief);
-//        private TextView tv_carWash;
             tv_carWash.setText(weather.suggestion.carWash.brief);
-//        private TextView tv_dressing;
             tv_dressing.setText(weather.suggestion.dressing.brief);
-//        private TextView tv_sport;
             tv_sport.setText(weather.suggestion.sport.brief);
-//        private TextView tv_travel;
             tv_travel.setText(weather.suggestion.travel.brief);
-//        private TextView tv_ultraviolet;
             tv_ultraviolet.setText(weather.suggestion.ultraviolet.brief);
-//        private TextView tv_air;
             tv_air.setText(weather.suggestion.air.brief);
-//        private TextView tv_flu;
             tv_flu.setText(weather.suggestion.flu.brief);
             weatherLayout.setVisibility(View.VISIBLE);
-
             //启动后台更新天气服务
             Intent intent=new Intent(this, AutoUpdateService.class);
             startService(intent);
@@ -320,24 +349,40 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
         }
     }
 
+
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
     }
 
+
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.choose_area:
-                drawerLayout.openDrawer(GravityCompat.START);
-                break;
+
             default:
                 break;
         }
     }
 
 
+
     public void setWeatherId(String id) {
         weatherId = id;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                drawer_layout.openDrawer(GravityCompat.START);
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 }
