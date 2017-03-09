@@ -15,8 +15,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -30,9 +30,12 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.random.coolweather.gson.Weather;
 import com.example.random.coolweather.gson.dailyForecast;
+import com.example.random.coolweather.gson.hourlyForecast;
 import com.example.random.coolweather.service.AutoUpdateService;
 import com.example.random.coolweather.util.HttpUtil;
 import com.example.random.coolweather.util.Utility;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 
@@ -52,7 +55,9 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
 
     private TextView weatherInfoText;
 
-    private LinearLayout forecastLayout;
+    private LinearLayout dforecastLayout;
+
+    private LinearLayout hforecastLayout;
 
     private TextView aqiText;
 
@@ -85,7 +90,6 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
     private Toolbar toolbar;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,22 +105,21 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
     }
 
 
-
     /**
      * 初始化
      */
     private void init() {
-        toolbar= (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
         //隐藏toolbar的标题
-        drawer_layout= (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBar actionBar=getSupportActionBar();
-        if (actionBar!=null){
+        drawer_layout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.mipmap.category);
         }
-        NavigationView navView= (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -134,7 +137,8 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
 //        titleUpdateTime = (TextView) findViewById(R.id.title_update_time);
         degreeText = (TextView) findViewById(R.id.degree_text);
         weatherInfoText = (TextView) findViewById(R.id.weather_info_text);
-        forecastLayout = (LinearLayout) findViewById(R.id.forecast_layout);
+        dforecastLayout = (LinearLayout) findViewById(R.id.dforecast_layout);
+        hforecastLayout = (LinearLayout) findViewById(R.id.hforecast_layout);
         aqiText = (TextView) findViewById(R.id.aqi_text);
         pm25Text = (TextView) findViewById(R.id.pm25_text);
         tv_sunrise = (TextView) findViewById(R.id.tv_sunrise);
@@ -188,16 +192,23 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         weatherString = prefs.getString("weather", null);
 
-        if (weatherString != null) {
-            //有缓存时直接解析天气数据
-            Weather weather = Utility.handleWeatherResponse(weatherString);
-            weatherId = weather.basic.weatherId;
-            showWeatherInfo(weather);
+        Intent intent = this.getIntent();
+        String cityId = intent.getStringExtra("cityId");
+        Log.d("WeatherActivity", "cityId199: " + cityId);
+        if (cityId != null) {
+            requestWeather(cityId);
         } else {
-            //无缓存时去服务器查询天气
-            weatherId = getIntent().getStringExtra("weather_id");
-            weatherLayout.setVisibility(View.INVISIBLE);
-            requestWeather(weatherId);
+            if (weatherString != null) {
+                //有缓存时直接解析天气数据
+                Weather weather = Utility.handleWeatherResponse(weatherString);
+                weatherId = weather.basic.weatherId;
+                showWeatherInfo(weather);
+            } else {
+                //无缓存时去服务器查询天气
+                weatherId = getIntent().getStringExtra("weather_id");
+                weatherLayout.setVisibility(View.INVISIBLE);
+                requestWeather(weatherId);
+            }
         }
 
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -250,6 +261,7 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
     public void requestWeather(String weatherId) {
         String weatherUrl = "https://free-api.heweather.com/v5/weather?city=" + weatherId +
                 "&key=e2a9d389ea074e8f99d2ee2d69f9e744";
+        Log.d("WeatherActivity", "weatherUrl" + weatherUrl);
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -297,7 +309,6 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
     }
 
 
-
     /**
      * 处理并展示Weather实体类中的数据
      *
@@ -306,25 +317,34 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
     private void showWeatherInfo(Weather weather) {
         if (weather != null && "ok".equals(weather.status)) {
             String cityName = weather.basic.cityName;
-            String updateTime = weather.basic.update.updateTime.split(" ")[1];
             String degree = weather.now.temperature + "°C";
             String weatherInfo = weather.now.condition.info;
             titleCity.setText(cityName);
-//            titleUpdateTime.setText(updateTime);
             degreeText.setText(degree);
             weatherInfoText.setText(weatherInfo);
-            forecastLayout.removeAllViews();
+            dforecastLayout.removeAllViews();
             for (dailyForecast forecast : weather.dforecastList) {
-                View view = LayoutInflater.from(this).inflate(R.layout.forecast_item, forecastLayout, false);
+                View view = LayoutInflater.from(this).inflate(R.layout.dforecast_item, dforecastLayout, false);
                 TextView dateText = (TextView) view.findViewById(R.id.date_text);
                 TextView infoText = (TextView) view.findViewById(R.id.info_text);
                 TextView maxText = (TextView) view.findViewById(R.id.max_text);
                 TextView minText = (TextView) view.findViewById(R.id.min_text);
                 dateText.setText(forecast.date);
                 infoText.setText(forecast.condition.day);
-                maxText.setText(forecast.temperature.max);
-                minText.setText(forecast.temperature.min);
-                forecastLayout.addView(view);
+                maxText.setText(forecast.temperature.max + "°C");
+                minText.setText(forecast.temperature.min + "°C");
+                dforecastLayout.addView(view);
+            }
+            hforecastLayout.removeAllViews();
+            for (hourlyForecast forecast : weather.hforecastList) {
+                View view = LayoutInflater.from(this).inflate(R.layout.hforecast_item, hforecastLayout, false);
+                TextView timeText = (TextView) view.findViewById(R.id.tv_time);
+                TextView txtText = (TextView) view.findViewById(R.id.tv_txt);
+                TextView tmpText = (TextView) view.findViewById(R.id.tv_tmp);
+                timeText.setText(forecast.date);
+                txtText.setText(forecast.cond.txt);
+                tmpText.setText(forecast.tmp + "°C");
+                hforecastLayout.addView(view);
             }
             if (weather.aqi != null) {
                 aqiText.setText(weather.aqi.city.aqi);
@@ -342,7 +362,7 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
             tv_flu.setText(weather.suggestion.flu.brief);
             weatherLayout.setVisibility(View.VISIBLE);
             //启动后台更新天气服务
-            Intent intent=new Intent(this, AutoUpdateService.class);
+            Intent intent = new Intent(this, AutoUpdateService.class);
             startService(intent);
         } else {
             Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
@@ -350,12 +370,10 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
     }
 
 
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
     }
-
 
 
     @Override
@@ -368,7 +386,6 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
     }
 
 
-
     public void setWeatherId(String id) {
         weatherId = id;
     }
@@ -376,7 +393,7 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 drawer_layout.openDrawer(GravityCompat.START);
                 break;

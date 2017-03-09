@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <SearchView
+        android:id="@+id/sv_search_city"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:inputType="text"
+        android:queryHint="请输入城市名"
+        android:background="#878dcf"/>
+
+    <TextView
+        android:id="@+id/tv_empty_city"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="没有城市"
+        android:gravity="center"
+        android:visibility="gone"/>
+
+    <ListView
+        android:id="@+id/lv_city"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+</LinearLayout>

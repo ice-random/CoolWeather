@@ -19,4 +19,15 @@ public class hourlyForecast {
 //            "dir": "东北风",  //风向
 //            "sc": "4-5",  //风力
 //            "spd": "24"  //风速（kmph）
+    public Cond cond;
+
+    public class Cond {
+        public String txt;
+    }
+
+    public String date;
+
+//    public String pop;
+
+    public String tmp;
 }

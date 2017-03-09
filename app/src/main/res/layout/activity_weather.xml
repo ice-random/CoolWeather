@@ -41,7 +41,9 @@
 
                     <include layout="@layout/now" />
 
-                    <include layout="@layout/forecast" />
+                    <include layout="@layout/dforecast" />
+
+                    <include layout="@layout/hforecast"/>
 
                     <include layout="@layout/aqi" />
 
