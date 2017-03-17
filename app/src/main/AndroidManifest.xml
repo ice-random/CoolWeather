@@ -39,12 +39,15 @@
             android:enabled="true"
             android:process=":remote" />
 
-        <activity android:name=".LBSActivity"></activity>
+        <activity android:name=".LBSActivity" />
 
         <service
             android:name=".service.AutoUpdateService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".SettingActivity" />
+        <activity android:name=".DetailActivity"></activity>
     </application>
 
 </manifest>

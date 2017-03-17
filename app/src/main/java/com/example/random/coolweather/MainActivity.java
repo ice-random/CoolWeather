@@ -1,15 +1,16 @@
 package com.example.random.coolweather;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -18,7 +19,6 @@ import android.widget.Toast;
 import com.example.random.coolweather.Adapter.CityAdapter;
 import com.example.random.coolweather.db.db_City;
 import com.example.random.coolweather.gson.City;
-import com.example.random.coolweather.gson.Weather;
 import com.example.random.coolweather.util.HttpUtil;
 import com.example.random.coolweather.util.Utility;
 
@@ -33,7 +33,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     private SearchView sv_search_city;
 
@@ -45,15 +45,19 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     private ListView lv_city;
 
+    private CityAdapter adapter;
+
+    private db_City cityData;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search);
 
-        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
-        if (prefs.getString("weather",null)!=null){
-            Intent intent=new Intent(MainActivity.this,WeatherActivity.class);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (prefs.getString("weather", null) != null) {
+            Intent intent = new Intent(MainActivity.this, WeatherActivity.class);
             startActivity(intent);
             finish();
         }
@@ -65,12 +69,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         Connector.getDatabase();
         loadCity();
         lv_city.setOnItemClickListener(this);
+        lv_city.setOnItemLongClickListener(this);
     }
 
 
     private void loadCity() {
         cityList = DataSupport.findAll(db_City.class);
-        CityAdapter adapter = new CityAdapter(MainActivity.this, R.layout.city_item, cityList);
+        adapter = new CityAdapter(MainActivity.this, R.layout.city_item, cityList);
         lv_city.setAdapter(adapter);
     }
 
@@ -129,12 +134,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                         @Override
                         public void run() {
                             if (city != null && "ok".equals(city.status)) {
-                                db_City cityData = new db_City();
+                                cityData = new db_City();
                                 cityData.setNum(city.basic.ID);
                                 cityData.setCity(city.basic.cityName);
                                 Log.d("MainActivity", "138" + city.basic.cityName);
                                 cityData.save();
-//                                Log.d("MainActivity", "显示该城市信息是否保存，true保存，false不保存" + String.valueOf(a));
                                 Log.d("MainActivity", "查询第一条数据的城市名" + DataSupport.findFirst(db_City.class).getCity());
                                 loadCity();
                             } else {
@@ -153,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     /**
      * listview的监听器
+     *
      * @param parent
      * @param view
      * @param position
@@ -160,12 +165,36 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        db_City city=cityList.get(position);
-        Intent intent=new Intent(MainActivity.this, WeatherActivity.class);
-        Log.d("MainActivity","cityId"+city.getNum());
-        Log.d("MainActivity","cityId"+city.getCity());
-        intent.putExtra("cityId",city.getNum());
+        db_City city = cityList.get(position);
+        Intent intent = new Intent(MainActivity.this, WeatherActivity.class);
+        Log.d("MainActivity", "cityId" + city.getNum());
+        Log.d("MainActivity", "cityId" + city.getCity());
+        intent.putExtra("cityId", city.getNum());
         startActivity(intent);
         finish();
+    }
+
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, final long id) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("确定删除？")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DataSupport.deleteAll(db_City.class, "City = ?", cityList.get(position).getCity());
+                        adapter.notifyDataSetChanged();
+                        loadCity();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+        builder.create().show();
+        return true;
     }
 }

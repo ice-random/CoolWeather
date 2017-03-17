@@ -4,13 +4,29 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimaryDark">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="城市列表"
+            android:textSize="20sp"
+            android:textColor="#fff"/>
+    </android.support.v7.widget.Toolbar>
+
     <SearchView
         android:id="@+id/sv_search_city"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="40dp"
         android:inputType="text"
         android:queryHint="请输入城市名"
-        android:background="#878dcf"/>
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:background="@drawable/shape"/>
 
     <TextView
         android:id="@+id/tv_empty_city"

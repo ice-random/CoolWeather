@@ -6,12 +6,22 @@
     android:orientation="vertical"
     android:layout_margin="15dp">
 
+    <!--居中显示城市名-->
+    <TextView
+        android:id="@+id/title_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#fff"
+        android:textSize="20sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="5dp"/>
+
     <!--显示当前气温-->
     <TextView
         android:id="@+id/degree_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
+        android:layout_gravity="start"
         android:textColor="#fff"
         android:textSize="60sp"/>
 
@@ -20,7 +30,9 @@
         android:id="@+id/weather_info_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
+        android:layout_gravity="start"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
         android:textColor="#fff"
         android:textSize="20sp"/>
 

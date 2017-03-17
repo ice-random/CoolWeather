@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/setting"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.random.coolweather.SettingActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimaryDark">
+
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="10dp"
+            android:background="@mipmap/back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="设置"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+    </android.support.v7.widget.Toolbar>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="自动刷新"
+        android:textSize="20sp"
+        android:layout_marginTop="65dp"
+        android:layout_marginLeft="18dp"
+        android:textColor="#000"/>
+    <RadioGroup
+        android:id="@+id/rg_renovate"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="90dp">
+
+        <RadioButton
+            android:id="@+id/renovate_none"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="不更新"
+            android:textSize="20sp" />
+
+        <RadioButton
+            android:id="@+id/renovate_three"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="每3个小时"
+            android:textSize="20sp" />
+
+        <RadioButton
+            android:id="@+id/renovate_six"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="每6个小时"
+            android:textSize="20sp" />
+
+        <RadioButton
+            android:id="@+id/renovate_halfDay"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="每12个小时"
+            android:textSize="20sp" />
+
+        <RadioButton
+            android:id="@+id/renovate_day"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="每24个小时"
+            android:textSize="20sp" />
+    </RadioGroup>
+</RelativeLayout>

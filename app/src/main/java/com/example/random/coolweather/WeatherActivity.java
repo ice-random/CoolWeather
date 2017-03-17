@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -13,7 +14,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,21 +35,17 @@ import com.example.random.coolweather.service.AutoUpdateService;
 import com.example.random.coolweather.util.HttpUtil;
 import com.example.random.coolweather.util.Utility;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class WeatherActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+public class WeatherActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ScrollView weatherLayout;
 
     private TextView titleCity;
-
-    private TextView titleUpdateTime;
 
     private TextView degreeText;
 
@@ -64,10 +60,6 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
     private TextView pm25Text;
 
     public DrawerLayout drawerLayout;
-
-    private ImageButton choose_area;
-
-    private Button btn_Nav;
 
     private TextView tv_sunrise, tv_sunset, tv_comfort, tv_carWash,
             tv_dressing, tv_sport, tv_travel, tv_ultraviolet, tv_air, tv_flu;
@@ -88,6 +80,10 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
     private DrawerLayout drawer_layout;
 
     private Toolbar toolbar;
+
+    private Button btn_editCity;
+
+    private Button btn_set;
 
 
     @Override
@@ -113,28 +109,15 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
         //隐藏toolbar的标题
+        btn_editCity = (Button) findViewById(R.id.btn_editCity);
+//        btn_set = (Button) findViewById(R.id.btn_set);
+//        btn_set.setOnClickListener(this);
+        btn_editCity.setOnClickListener(this);
         drawer_layout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.mipmap.category);
-        }
-        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
-        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                drawer_layout.closeDrawers();
-                return true;
-            }
-        });
-
-
-//        btn_Nav= (Button) findViewById(R.id.btn_Nav);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
         weatherLayout = (ScrollView) findViewById(R.id.weather_layout);
         titleCity = (TextView) findViewById(R.id.title_city);
-//        titleUpdateTime = (TextView) findViewById(R.id.title_update_time);
         degreeText = (TextView) findViewById(R.id.degree_text);
         weatherInfoText = (TextView) findViewById(R.id.weather_info_text);
         dforecastLayout = (LinearLayout) findViewById(R.id.dforecast_layout);
@@ -173,9 +156,6 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
         tv_show_ultraviolet.setTypeface(font);
         tv_show_air.setTypeface(font);
         tv_show_flu.setTypeface(font);
-//        btn_Nav.setTypeface(font);
-//        btn_Nav.setText(R.string.category);
-
         tv_show_sunrise.setText(getResources().getString(R.string.sun_rise));
         tv_show_sunset.setText(getResources().getString(R.string.sun_set));
         tv_show_comfort.setText(getResources().getString(R.string.comfort));
@@ -196,6 +176,7 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
         String cityId = intent.getStringExtra("cityId");
         Log.d("WeatherActivity", "cityId199: " + cityId);
         if (cityId != null) {
+            weatherId = cityId;
             requestWeather(cityId);
         } else {
             if (weatherString != null) {
@@ -362,44 +343,33 @@ public class WeatherActivity extends AppCompatActivity implements NavigationView
             tv_flu.setText(weather.suggestion.flu.brief);
             weatherLayout.setVisibility(View.VISIBLE);
             //启动后台更新天气服务
-            Intent intent = new Intent(this, AutoUpdateService.class);
-            startService(intent);
+            int hour = prefs.getInt("hour", 0);
+            if (hour != 0) {
+                Intent intent = new Intent(this, AutoUpdateService.class);
+                intent.putExtra("hour", hour);
+                startService(intent);
+            }
         } else {
             Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
         }
     }
 
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
-    }
-
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-
-            default:
-                break;
-        }
-    }
-
-
-    public void setWeatherId(String id) {
-        weatherId = id;
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                drawer_layout.openDrawer(GravityCompat.START);
+            case R.id.btn_editCity:
+                //清空pref中的内容，切换城市
+                SharedPreferences.Editor editor = PreferenceManager
+                        .getDefaultSharedPreferences(WeatherActivity.this)
+                        .edit();
+                editor.clear();
+                editor.apply();
+                Intent intent = new Intent(WeatherActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
                 break;
             default:
                 break;
         }
-        return true;
     }
 }
