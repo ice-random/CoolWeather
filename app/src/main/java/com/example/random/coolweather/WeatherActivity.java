@@ -7,20 +7,14 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -77,13 +71,9 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 
     private String weatherId;
 
-    private DrawerLayout drawer_layout;
-
     private Toolbar toolbar;
 
     private Button btn_editCity;
-
-    private Button btn_set;
 
 
     @Override
@@ -113,8 +103,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
 //        btn_set = (Button) findViewById(R.id.btn_set);
 //        btn_set.setOnClickListener(this);
         btn_editCity.setOnClickListener(this);
-        drawer_layout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
         weatherLayout = (ScrollView) findViewById(R.id.weather_layout);
         titleCity = (TextView) findViewById(R.id.title_city);
@@ -242,6 +230,9 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     public void requestWeather(String weatherId) {
         String weatherUrl = "https://free-api.heweather.com/v5/weather?city=" + weatherId +
                 "&key=e2a9d389ea074e8f99d2ee2d69f9e744";
+
+
+        https://free-api.heweather.com/v5/weather?city=CN101210111&key=e2a9d389ea074e8f99d2ee2d69f9e744"
         Log.d("WeatherActivity", "weatherUrl" + weatherUrl);
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
