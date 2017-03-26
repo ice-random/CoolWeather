@@ -1,6 +1,4 @@
-package com.example.random.coolweather; /**
- * Created by random on 17/3/5.
- */
+package com.example.random.coolweather;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -8,10 +6,7 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 /**
- *
  * 自定义字体图标
- * @author M.Z
- *
  */
 public class FontTextView extends TextView {
 

@@ -9,17 +9,24 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
-import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
@@ -27,6 +34,7 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.example.random.coolweather.Adapter.CityAdapter;
+import com.example.random.coolweather.customizeView.SearchViewCustom;
 import com.example.random.coolweather.db.db_City;
 import com.example.random.coolweather.gson.City;
 import com.example.random.coolweather.util.HttpUtil;
@@ -39,31 +47,76 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, View.OnClickListener {
+import static android.view.View.VISIBLE;
 
-    private static final String TAG ="MainActivity" ;
-    private SearchView sv_search_city;
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, View.OnClickListener, TextView.OnEditorActionListener, TextWatcher {
+
+    private static final String TAG = "MainActivity";
+
+    @BindView(R.id.sv_search_city)
+    SearchView sv_search_city;
 
     private List<db_City> cityList = new ArrayList<>();
 
-    private ListView lv_city;
+    @BindView(R.id.lv_city)
+    ListView lv_city;
 
     private CityAdapter adapter;
 
     private db_City cityData;
 
+
+    /**
+     * 搜索栏没有显示
+     */
+    private static final int NOT_STARTED_SEARCH = 0;
+
+    /**
+     * 搜索栏显示出来，未输入文字，已经准备好搜索
+     */
+    private static final int READY_SEARCH = 1;
+
+    /**
+     * 搜索栏内输入了文字，点击搜索按钮即可搜索城市名
+     */
+    private static final int SEARCHING = 2;
+
+    /**
+     * 搜索栏状态
+     */
+    private static int search_status = NOT_STARTED_SEARCH;
+
     private LocationClient mLocationClient;
 
-    private Button btn_location_client;
+    @BindView(R.id.btn_location_client)
+    FloatingActionButton btn_location_client;
 
-    private Button btn_search;
+    @BindView(R.id.btn_search)
+    ImageButton btn_search;
 
-    private View mCoordinatorLayout;
+    @BindView(R.id.mCoordinatorLayout)
+    View mCoordinatorLayout;
 
+    @BindView(R.id.SearchView)
+    SearchViewCustom searchViewCustom;
+
+    @BindView(R.id.btn_back)
+    ImageButton btn_back;
+
+    @BindView(R.id.et_input)
+    EditText ed_input;
+
+    @BindView(R.id.tv_title)
+    TextView tv_title;
+
+    @BindView(R.id.btn_delete)
+    ImageButton btn_delete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,18 +131,28 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             finish();
         }
         cityList = new ArrayList<>();
-        sv_search_city = (SearchView) findViewById(R.id.sv_search_city);
-        lv_city = (ListView) findViewById(R.id.lv_city);
-        btn_location_client= (Button) findViewById(R.id.btn_location_client);
-        btn_search= (Button) findViewById(R.id.btn_search);
-        btn_search.setOnClickListener(this);
-        mCoordinatorLayout=  findViewById(R.id.mCoordinatorLayout);
+        ButterKnife.bind(this);
+        btn_back.setOnClickListener(this);
         btn_location_client.setOnClickListener(this);
-        sv_search_city.setOnQueryTextListener(this);
-        Connector.getDatabase();
-        loadCity();
+        btn_search.setOnClickListener(this);
         lv_city.setOnItemClickListener(this);
         lv_city.setOnItemLongClickListener(this);
+        sv_search_city.setOnQueryTextListener(this);
+        ed_input.setOnEditorActionListener(this);
+        ed_input.addTextChangedListener(this);
+        btn_delete.setOnClickListener(this);
+        /**
+         * 创建数据库
+         */
+        Connector.getDatabase();
+        /**
+         * 加载已经保存的城市列表
+         */
+        loadCity();
+
+        /**
+         * 检查定位权限
+         */
         List<String> permissionList = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(android.Manifest.permission.ACCESS_FINE_LOCATION);
@@ -107,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             ActivityCompat.requestPermissions(MainActivity.this, permissions, 1);
         }
     }
+
 
     /**
      * 开始定位
@@ -126,7 +190,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         mLocationClient.setLocOption(option);
     }
 
-
+    /**
+     * 从SQLite中加载城市列表
+     */
     private void loadCity() {
         cityList = DataSupport.findAll(db_City.class);
         adapter = new CityAdapter(MainActivity.this, R.layout.city_item, cityList);
@@ -142,9 +208,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public boolean onQueryTextSubmit(String query) {
         String cityName = sv_search_city.getQuery().toString();
-        searchCity(cityName);
+        searchCity(cityName, null);
         return false;
     }
+
 
     /**
      * 当文字改变的时候执行的方法
@@ -157,13 +224,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         return false;
     }
 
-
     /**
      * 查询城市
      */
-    private void searchCity(String cityName) {
-
-        Log.d(TAG, "searchCity: "+cityName);
+    private void searchCity(String cityName, String districtName) {
+        Log.d(TAG, "searchCity: " + cityName);
         String url = "https://free-api.heweather.com/v5//search?city="
                 + cityName + "&key=e2a9d389ea074e8f99d2ee2d69f9e744";
         HttpUtil.sendOkHttpRequest(url, new Callback() {
@@ -182,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             public void onResponse(Call call, Response response) {
                 try {
                     final String responseText = response.body().string();
-                    Log.d(TAG, "onResponse: responseText"+responseText);
+                    Log.d(TAG, "onResponse: responseText" + responseText);
                     final City city = Utility.handleCityResponse(responseText);
                     runOnUiThread(new Runnable() {
                         @Override
@@ -196,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                                     cityData.setNum(city.basic.ID);
                                     cityData.setCity(city.basic.cityName);
                                     cityData.save();
-                                    Log.d(TAG, "run: "+"查询第一条数据的城市名" + DataSupport.findFirst(db_City.class).getCity());
+                                    Log.d(TAG, "run: " + "查询第一条数据的城市名" + DataSupport.findFirst(db_City.class).getCity());
                                     loadCity();
                                 } else {
                                     Toast.makeText(MainActivity.this, "已存在该城市", Toast.LENGTH_SHORT).show();
@@ -214,8 +279,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     }
 
+
     /**
      * 若权限未同意则退出
+     *
      * @param requestCode
      * @param permissions
      * @param grantResults
@@ -267,6 +334,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     /**
      * 长按删除listView中的天气数据
+     *
      * @param parent
      * @param view
      * @param position
@@ -296,18 +364,108 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         return true;
     }
 
+
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btn_location_client:
                 requestLocation();
                 break;
             case R.id.btn_search:
-                Intent intent=new Intent(MainActivity.this,SearchActivity.class);
-                startActivity(intent);
+                if (search_status == NOT_STARTED_SEARCH) {
+                    //搜索栏已经出现
+                    search_status = READY_SEARCH;
+                    ChangeSearchStatus();
+                } else {
+                    search_status = NOT_STARTED_SEARCH;
+                    ChangeSearchStatus();
+                    String cityName = ed_input.getText().toString();
+                    searchCity(cityName, null);
+                }
+                break;
+            case R.id.btn_back:
+                //搜索栏消失
+                search_status = NOT_STARTED_SEARCH;
+                ChangeSearchStatus();
+                break;
+            case R.id.btn_delete:
+                search_status = READY_SEARCH;
+                ChangeSearchStatus();
             default:
                 break;
         }
+    }
+
+    private void ChangeSearchStatus() {
+        if (search_status == NOT_STARTED_SEARCH) {
+            //搜索栏未显示
+            tv_title.setVisibility(VISIBLE);
+            searchViewCustom.setVisibility(View.INVISIBLE);
+        } else if (search_status == READY_SEARCH) {
+            //搜索栏刚刚显示出来，尚未输入文字
+            tv_title.setVisibility(View.INVISIBLE);
+            searchViewCustom.setVisibility(VISIBLE);
+            btn_delete.setVisibility(View.INVISIBLE);
+            ed_input.setText("");
+        } else if (search_status == SEARCHING) {
+            btn_delete.setVisibility(VISIBLE);
+        }
+    }
+
+    /**
+     * 点击软键盘上的搜索按钮，搜索城市
+     *
+     * @param v
+     * @param actionId
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+            Log.d(TAG, "onEditorAction: v.getText()" + v.getText());
+            String cityName = v.getText().toString();
+            searchCity(cityName, null);
+            search_status=NOT_STARTED_SEARCH;
+            ChangeSearchStatus();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (search_status==NOT_STARTED_SEARCH){
+            finish();
+        }else {
+            search_status=NOT_STARTED_SEARCH;
+            ChangeSearchStatus();
+        }
+        return false;
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        Log.d(TAG, "beforeTextChanged: ");
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        Log.d(TAG, "onTextChanged: ");
+        if (ed_input.getText().toString().equals("")) {
+            btn_delete.setVisibility(View.INVISIBLE);
+        } else {
+            btn_delete.setVisibility(VISIBLE);
+        }
+    }
+
+    /**
+     * 当输入框中有文字，显示删除按钮。
+     *
+     * @param s
+     */
+    @Override
+    public void afterTextChanged(Editable s) {
+        Log.d(TAG, "afterTextChanged: ");
     }
 
     /**
@@ -317,14 +475,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
             String mCity = bdLocation.getCity();
-
-            searchCity(mCity);
-            Snackbar.make(mCoordinatorLayout,"您定位在"+mCity,Snackbar.LENGTH_SHORT).show();
-            Log.d(TAG, "onReceiveLocation: 您定位在"+mCity);
-            Log.d(TAG, "onReceiveLocation: district"+bdLocation.getDistrict());
-
+            String mDistrict = bdLocation.getDistrict();
+            searchCity(mCity, mDistrict);
+            Snackbar.make(mCoordinatorLayout, "您定位在" + mCity + mDistrict, Snackbar.LENGTH_SHORT).show();
             mLocationClient.stop();
-
         }
 
         @Override
@@ -332,4 +486,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         }
     }
+
+
 }

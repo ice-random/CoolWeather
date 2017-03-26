@@ -10,16 +10,16 @@
         android:layout_height="match_parent">
 
 
-        <!--&lt;!&ndash;设置按钮&ndash;&gt;-->
-        <!--<Button-->
-            <!--android:id="@+id/btn_set"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="#0000"-->
-            <!--android:text="设置"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:textColor="#fff" />-->
+        <!--设置按钮-->
+        <Button
+            android:id="@+id/btn_set"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#0000"
+            android:text="设置"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:textColor="#fff" />
 
         <Button
             android:id="@+id/btn_editCity"

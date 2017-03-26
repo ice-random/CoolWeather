@@ -7,7 +7,6 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -31,50 +30,116 @@ import com.example.random.coolweather.util.Utility;
 
 import java.io.IOException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
 public class WeatherActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private ScrollView weatherLayout;
+    @BindView(R.id.weather_layout)
+    ScrollView weatherLayout;
 
-    private TextView titleCity;
+    @BindView(R.id.title_city)
+    TextView titleCity;
 
-    private TextView degreeText;
+    @BindView(R.id.degree_text)
+    TextView degreeText;
 
-    private TextView weatherInfoText;
+    @BindView(R.id.weather_info_text)
+    TextView weatherInfoText;
 
-    private LinearLayout dforecastLayout;
+    @BindView(R.id.dforecast_layout)
+    LinearLayout dforecastLayout;
 
-    private LinearLayout hforecastLayout;
+    @BindView(R.id.hforecast_layout)
+    LinearLayout hforecastLayout;
 
-    private TextView aqiText;
+    @BindView(R.id.aqi_text)
+    TextView aqiText;
 
-    private TextView pm25Text;
+    @BindView(R.id.pm25_text)
+    TextView pm25Text;
 
-    public DrawerLayout drawerLayout;
+    @BindView(R.id.tv_sunrise)
+    TextView tv_sunrise;
 
-    private TextView tv_sunrise, tv_sunset, tv_comfort, tv_carWash,
-            tv_dressing, tv_sport, tv_travel, tv_ultraviolet, tv_air, tv_flu;
+    @BindView(R.id.tv_sunset)
+    TextView tv_sunset;
 
-    private TextView tv_show_sunrise, tv_show_sunset, tv_show_comfort, tv_show_carWash,
-            tv_show_dressing, tv_show_sport, tv_show_travel, tv_show_ultraviolet, tv_show_air, tv_show_flu;
+    @BindView(R.id.tv_comfort)
+    TextView tv_comfort;
 
-    private ImageView bingPicImg;
+    @BindView(R.id.tv_carWash)
+    TextView tv_carWash;
 
-    public SwipeRefreshLayout swipeRefresh;
+    @BindView(R.id.tv_dressing)
+    TextView tv_dressing;
+
+    @BindView(R.id.tv_sport)
+    TextView tv_sport;
+
+    @BindView(R.id.tv_travel)
+    TextView tv_travel;
+
+    @BindView(R.id.tv_ultraviolet)
+    TextView tv_ultraviolet;
+
+    @BindView(R.id.tv_air)
+    TextView tv_air;
+
+    @BindView(R.id.tv_flu)
+    TextView tv_flu;
+
+
+    @BindView(R.id.tv_show_sunrise)
+    TextView tv_show_sunrise;
+
+    @BindView(R.id.tv_show_sunset)
+    TextView tv_show_sunset;
+
+    @BindView(R.id.tv_show_comfort)
+    TextView tv_show_comfort;
+
+    @BindView(R.id.tv_show_carWash)
+    TextView tv_show_carWash;
+
+    @BindView(R.id.tv_show_dressing)
+    TextView tv_show_dressing;
+
+    @BindView(R.id.tv_show_sport)
+    TextView tv_show_sport;
+
+    @BindView(R.id.tv_show_travel)
+    TextView tv_show_travel;
+
+    @BindView(R.id.tv_show_ultraviolet)
+    TextView tv_show_ultraviolet;
+
+    @BindView(R.id.tv_show_air)
+    TextView tv_show_air;
+
+    @BindView(R.id.tv_show_flu)
+    TextView tv_show_flu;
+
+    @BindView(R.id.bing_pic_img)
+     ImageView bingPicImg;
+
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout swipeRefresh;
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
+    @BindView(R.id.btn_editCity)
+    Button btn_editCity;
 
     private String weatherString;
 
     private SharedPreferences prefs;
 
     private String weatherId;
-
-    private Toolbar toolbar;
-
-    private Button btn_editCity;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,43 +160,11 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
      * 初始化
      */
     private void init() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
         //隐藏toolbar的标题
-        btn_editCity = (Button) findViewById(R.id.btn_editCity);
-//        btn_set = (Button) findViewById(R.id.btn_set);
-//        btn_set.setOnClickListener(this);
         btn_editCity.setOnClickListener(this);
-        bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
-        weatherLayout = (ScrollView) findViewById(R.id.weather_layout);
-        titleCity = (TextView) findViewById(R.id.title_city);
-        degreeText = (TextView) findViewById(R.id.degree_text);
-        weatherInfoText = (TextView) findViewById(R.id.weather_info_text);
-        dforecastLayout = (LinearLayout) findViewById(R.id.dforecast_layout);
-        hforecastLayout = (LinearLayout) findViewById(R.id.hforecast_layout);
-        aqiText = (TextView) findViewById(R.id.aqi_text);
-        pm25Text = (TextView) findViewById(R.id.pm25_text);
-        tv_sunrise = (TextView) findViewById(R.id.tv_sunrise);
-        tv_sunset = (TextView) findViewById(R.id.tv_sunset);
-        tv_comfort = (TextView) findViewById(R.id.tv_comfort);
-        tv_carWash = (TextView) findViewById(R.id.tv_carWash);
-        tv_dressing = (TextView) findViewById(R.id.tv_dressing);
-        tv_sport = (TextView) findViewById(R.id.tv_sport);
-        tv_travel = (TextView) findViewById(R.id.tv_travel);
-        tv_ultraviolet = (TextView) findViewById(R.id.tv_ultraviolet);
-        tv_air = (TextView) findViewById(R.id.tv_air);
-        tv_flu = (TextView) findViewById(R.id.tv_flu);
-        tv_show_sunrise = (TextView) findViewById(R.id.tv_show_sunrise);
-        tv_show_sunset = (TextView) findViewById(R.id.tv_show_sunset);
-        tv_show_comfort = (TextView) findViewById(R.id.tv_show_comfort);
-        tv_show_carWash = (TextView) findViewById(R.id.tv_show_carWash);
-        tv_show_dressing = (TextView) findViewById(R.id.tv_show_dressing);
-        tv_show_sport = (TextView) findViewById(R.id.tv_show_sport);
-        tv_show_travel = (TextView) findViewById(R.id.tv_show_travel);
-        tv_show_ultraviolet = (TextView) findViewById(R.id.tv_show_ultraviolet);
-        tv_show_air = (TextView) findViewById(R.id.tv_show_air);
-        tv_show_flu = (TextView) findViewById(R.id.tv_show_flu);
         Typeface font = Typeface.createFromAsset(getAssets(), "iconfont.ttf");
         tv_show_sunrise.setTypeface(font);
         tv_show_sunrise.setTypeface(font);
@@ -230,9 +263,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     public void requestWeather(String weatherId) {
         String weatherUrl = "https://free-api.heweather.com/v5/weather?city=" + weatherId +
                 "&key=e2a9d389ea074e8f99d2ee2d69f9e744";
-
-
-        https://free-api.heweather.com/v5/weather?city=CN101210111&key=e2a9d389ea074e8f99d2ee2d69f9e744"
         Log.d("WeatherActivity", "weatherUrl" + weatherUrl);
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override

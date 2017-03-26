@@ -8,7 +8,7 @@
         android:id="@+id/tv_city"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="30sp"
-        android:layout_margin="10dp"
+        android:textSize="18sp"
+        android:layout_margin="15dp"
         android:textColor="#000"/>
 </LinearLayout>
